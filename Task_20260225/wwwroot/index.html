@@ -66,7 +66,7 @@
     <div class="card"><h1>Employee Quick Client</h1></div>
 
     <div class="card">
-      <h2>1) ÆÄÀÏ ¾÷·Îµå</h2>
+      <h2>1) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½</h2>
       <div class="row">
         <input id="fileInput" type="file" accept=".json,.csv" />
         <button id="uploadFileBtn">POST /api/Employee</button>
@@ -74,15 +74,15 @@
     </div>
 
     <div class="card">
-      <h2>2) ÅØ½ºÆ® ¾÷·Îµå</h2>
-      <textarea id="textInput" placeholder='JSON ¶Ç´Â CSV ÅØ½ºÆ®¸¦ ºÙ¿©³ÖÀ¸¼¼¿ä'></textarea>
+      <h2>2) ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½Îµï¿½</h2>
+      <textarea id="textInput" placeholder='Json ë˜ëŠ” CSV í˜•ì‹'></textarea>
       <div class="row">
         <button id="uploadTextBtn">POST /api/Employee</button>
       </div>
     </div>
 
     <div class="card">
-      <h2>3) Á¶È¸</h2>
+      <h2>3) ï¿½ï¿½È¸</h2>
       <div class="row">
         <input id="page" type="number" value="1" min="1" />
         <input id="pageSize" type="number" value="20" min="1" />
@@ -91,7 +91,7 @@
     </div>
 
     <div class="card">
-      <h2>ÀÀ´ä</h2>
+      <h2>ï¿½ï¿½ï¿½ï¿½</h2>
       <pre id="result"></pre>
     </div>
   </div>
@@ -104,7 +104,7 @@
 
     document.getElementById('uploadFileBtn').onclick = async () => {
       const file = document.getElementById('fileInput').files[0];
-      if (!file) return show('ERROR', 'ÆÄÀÏÀ» ¼±ÅÃÇÏ¼¼¿ä.');
+      if (!file) return show('ERROR', 'íŒŒì¼?.');
       const form = new FormData();
       form.append('file', file);
       const res = await fetch('/api/Employee', { method: 'POST', body: form });
