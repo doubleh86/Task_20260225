@@ -1,6 +1,0 @@
-@Task_20260225_HostAddress = http://localhost:5255
-
-GET {{Task_20260225_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

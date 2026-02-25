@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Quick Client</title>
+  <style>
+    :root {
+      --bg: linear-gradient(135deg, #f4f7f1 0%, #eef6ff 100%);
+      --card: #ffffff;
+      --line: #d7e0ec;
+      --text: #1e2a36;
+      --accent: #0f766e;
+      --accent2: #0369a1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    h1 { margin: 0; font-size: 24px; }
+    h2 { margin: 0 0 10px; font-size: 16px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    input, textarea, button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      font: inherit;
+    }
+    textarea { width: 100%; min-height: 140px; resize: vertical; }
+    button {
+      border: none;
+      color: #fff;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      cursor: pointer;
+    }
+    pre {
+      margin: 0;
+      background: #0b1220;
+      color: #e6edf3;
+      padding: 12px;
+      border-radius: 10px;
+      overflow: auto;
+      min-height: 160px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card"><h1>Employee Quick Client</h1></div>
+
+    <div class="card">
+      <h2>1) 파일 업로드</h2>
+      <div class="row">
+        <input id="fileInput" type="file" accept=".json,.csv" />
+        <button id="uploadFileBtn">POST /api/Employee</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2) 텍스트 업로드</h2>
+      <textarea id="textInput" placeholder='JSON 또는 CSV 텍스트를 붙여넣으세요'></textarea>
+      <div class="row">
+        <button id="uploadTextBtn">POST /api/Employee</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3) 조회</h2>
+      <div class="row">
+        <input id="page" type="number" value="1" min="1" />
+        <input id="pageSize" type="number" value="20" min="1" />
+        <button id="getBtn">GET /api/Employee</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>응답</h2>
+      <pre id="result"></pre>
+    </div>
+  </div>
+
+  <script>
+    const result = document.getElementById('result');
+    const show = (title, data) => {
+      result.textContent = `[${title}]\n` + (typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+    };
+
+    document.getElementById('uploadFileBtn').onclick = async () => {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return show('ERROR', '파일을 선택하세요.');
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/Employee', { method: 'POST', body: form });
+      const body = await res.text();
+      show(`POST /api/Employee (${res.status})`, body);
+    };
+
+    document.getElementById('uploadTextBtn').onclick = async () => {
+      const text = document.getElementById('textInput').value;
+      const form = new FormData();
+      form.append('text', text);
+      const res = await fetch('/api/Employee', { method: 'POST', body: form });
+      const body = await res.text();
+      show(`POST /api/Employee (${res.status})`, body);
+    };
+
+    document.getElementById('getBtn').onclick = async () => {
+      const page = document.getElementById('page').value;
+      const pageSize = document.getElementById('pageSize').value;
+      const res = await fetch(`/api/Employee?page=${page}&pageSize=${pageSize}`);
+      const body = await res.text();
+      show(`GET /api/Employee (${res.status})`, body);
+    };
+  </script>
+</body>
+</html>
+
