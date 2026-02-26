@@ -8,7 +8,24 @@ public class ContactCacheService
 
     public int AddContactList(List<ContactModel> contactModels)
     {
-        _contactModels.AddRange(contactModels);
+        if (contactModels.Count == 0)
+            return _contactModels.Count;
+
+        var existingEmails = new HashSet<string>(
+            _contactModels
+                .Where(x => string.IsNullOrWhiteSpace(x.Email) == false)
+                .Select(x => x.Email.Trim()),
+            StringComparer.OrdinalIgnoreCase);
+
+        var uniqueContacts = contactModels.Where(contact =>
+        {
+            if (string.IsNullOrWhiteSpace(contact.Email))
+                return true;
+
+            return existingEmails.Add(contact.Email.Trim());
+        });
+
+        _contactModels.AddRange(uniqueContacts);
         return _contactModels.Count;
     }
 

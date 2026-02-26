@@ -66,7 +66,7 @@
     <div class="card"><h1>Employee Quick Client</h1></div>
 
     <div class="card">
-      <h2>1) ���� ���ε�</h2>
+      <h2>1) 파일 업로드</h2>
       <div class="row">
         <input id="fileInput" type="file" accept=".json,.csv" />
         <button id="uploadFileBtn">POST /api/Employee</button>
@@ -74,7 +74,7 @@
     </div>
 
     <div class="card">
-      <h2>2) �ؽ�Ʈ ���ε�</h2>
+      <h2>2) 텍스트 업로드</h2>
       <textarea id="textInput" placeholder='Json 또는 CSV 형식'></textarea>
       <div class="row">
         <button id="uploadTextBtn">POST /api/Employee</button>
@@ -82,7 +82,7 @@
     </div>
 
     <div class="card">
-      <h2>3) ��ȸ</h2>
+      <h2>3) 조회</h2>
       <div class="row">
         <input id="page" type="number" value="1" min="1" />
         <input id="pageSize" type="number" value="20" min="1" />
@@ -91,7 +91,7 @@
     </div>
 
     <div class="card">
-      <h2>����</h2>
+      <h2>결과</h2>
       <pre id="result"></pre>
     </div>
   </div>
@@ -104,7 +104,7 @@
 
     document.getElementById('uploadFileBtn').onclick = async () => {
       const file = document.getElementById('fileInput').files[0];
-      if (!file) return show('ERROR', '파일?.');
+      if (!file) return show('ERROR', '파일을 선택해 주세요.');
       const form = new FormData();
       form.append('file', file);
       const res = await fetch('/api/Employee', { method: 'POST', body: form });
@@ -131,4 +131,3 @@
   </script>
 </body>
 </html>
-
