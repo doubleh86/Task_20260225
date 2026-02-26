@@ -20,7 +20,7 @@ public class LoggerService
     {
         if (exception != null)
         {
-            _logger?.Error(message, exception);
+            _logger?.Error(exception, message);
         }
         else
         {
@@ -35,7 +35,7 @@ public class LoggerService
                              .ForContext("MethodName", methodName);
         if (exception != null)
         {
-            logger?.Error(message, exception);
+            logger?.Error(exception, message);
         }
         else
         {
@@ -60,7 +60,7 @@ public class LoggerService
     {
         if (exception != null)
         {
-            _logger?.Warning(message, exception);
+            _logger?.Warning(exception, message);
         }
         else
         {
@@ -75,7 +75,7 @@ public class LoggerService
                              .ForContext("MethodName", methodName);
         if (exception != null)
         {
-            logger?.Warning(message, exception);
+            logger?.Warning(exception, message);
         }
         else
         {
