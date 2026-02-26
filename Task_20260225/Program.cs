@@ -43,13 +43,13 @@ bool _InitializeServices(IServiceProvider serviceProvider)
         return false;
     
     serverService.Initialize(configFiles);
-    serverService.LoggerService.Information("Initializing services completed");
+    serverService.LoggerService.Information(serverService, "Initializing services completed");
     
     var cacheService = serviceProvider.GetService<ContactCacheService>();
     if (cacheService == null)
         return false;
 
-    cacheService.Initialize(serverService.GetValue("StartWithData", false));
+    cacheService.Initialize(serverService.LoggerService, serverService.GetValue("StartWithData", false));
 
     return true;
 } 

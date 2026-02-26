@@ -7,14 +7,14 @@ using Task_20260225.Models;
 
 namespace Task_20260225.Handlers.Commands;
 
-public class UploadEmployeeInfoHandler : CommandHandler<int>
+public class UploadEmployeeInfoHandler : CommandHandler<(int successCount, int failedCount)>
 {
     public UploadEmployeeInfoHandler(UploadEmployeeInfoCommand command, ContactCacheService cacheService, LoggerService loggerService)
         : base(command, cacheService, loggerService)
     {
     }
 
-    public override async Task<int> HandleAsync()
+    public override async Task<(int successCount, int failedCount)> HandleAsync()
     {
         if (_command is not UploadEmployeeInfoCommand command)
             throw new ServerException(ErrorCode.InvalidCommand, "Invalid Command [UploadEmployeeInfoCommand]");
@@ -38,7 +38,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         throw new ServerException(ErrorCode.UploadEmployeeInfoWrongFileType, "Only .json or .csv files are supported");
     }
 
-    private async Task<int> _HandleTextType(string text)
+    private async Task<(int successCount, int failedCount)> _HandleTextType(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             throw new ServerException(ErrorCode.UploadEmployeeInfoTextEmpty, "Text is required");
@@ -52,7 +52,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         return await _HandleCsvTextType(text);
     }
 
-    private async Task<int> _HandleJsonType(IFormFile file)
+    private async Task<(int successCount, int failedCount)> _HandleJsonType(IFormFile file)
     {
         await using var stream = file.OpenReadStream();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -68,12 +68,13 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         }
 
         if (contacts is null || contacts.Count == 0)
-            return 0;
+            return (0, 0);
 
-        return _cacheService.AddContactList(contacts);
+        var successCount = _cacheService.AddContactList(contacts, out var failedCount);
+        return (successCount, failedCount);
     }
 
-    private async Task<int> _HandleCsvType(IFormFile file)
+    private async Task<(int successCount, int failedCount)> _HandleCsvType(IFormFile file)
     {
         await using var stream = file.OpenReadStream();
         using var reader = new StreamReader(stream);
@@ -98,12 +99,13 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         }
 
         if (contacts.Count == 0)
-            return 0;
+            return (0, 0);
 
-        return _cacheService.AddContactList(contacts);
+        var successCount = _cacheService.AddContactList(contacts, out var failedCount);
+        return (successCount, failedCount);
     }
 
-    private int _HandleJsonTextType(string text)
+    private (int successCount, int failedCount) _HandleJsonTextType(string text)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
@@ -111,21 +113,27 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         {
             var list = JsonSerializer.Deserialize<List<ContactModel>>(text, options);
             if (list is not null)
-                return _cacheService.AddContactList(list);
+            {
+                var successCount = _cacheService.AddContactList(list, out var failedCount);
+                return (successCount, failedCount);
+            }
 
             var single = JsonSerializer.Deserialize<ContactModel>(text, options);
             if (single is not null)
-                return _cacheService.AddContactList([single]);
+            {
+                var successCount = _cacheService.AddContactList([single], out var failedCount);
+                return (successCount, failedCount);
+            }
         }
         catch (JsonException)
         {
             throw new ServerException(ErrorCode.UploadEmployeeInfoInvalidJsonWithText, "Invalid JSON format");
         }
 
-        return 0;
+        return (0, 0);
     }
 
-    private async Task<int> _HandleCsvTextType(string text)
+    private async Task<(int successCount, int failedCount)> _HandleCsvTextType(string text)
     {
         using var reader = new StringReader(text);
         var contacts = new List<ContactModel>();
@@ -149,9 +157,10 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         }
 
         if (contacts.Count == 0)
-            return 0;
+            return (0, 0);
 
-        return _cacheService.AddContactList(contacts);
+        var successCount = _cacheService.AddContactList(contacts, out var failedCount);
+        return (successCount, failedCount);
     }
 
     protected override void _Dispose()

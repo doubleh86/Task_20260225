@@ -8,4 +8,9 @@ public class GetEmployeeByNameQuery : IQueryBase
     {
         Name = name;
     }
+
+    public string Description()
+    {
+        return $"[Name: {Name}]";
+    }
 }

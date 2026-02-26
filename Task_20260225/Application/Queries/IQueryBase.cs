@@ -2,5 +2,5 @@
 
 public interface IQueryBase
 {
-    
+    string Description();
 }

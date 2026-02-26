@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -27,9 +28,32 @@ public class LoggerService
         }
     }
 
+    public void Error(object source, string message, Exception exception = null, [CallerMemberName] string methodName = "")
+    {
+        var className = source.GetType().Name;
+        var logger = _logger?.ForContext("SourceContext", className)
+                             .ForContext("MethodName", methodName);
+        if (exception != null)
+        {
+            logger?.Error(message, exception);
+        }
+        else
+        {
+            logger?.Error(message);
+        }
+    }
+
     public void Information(string message)
     {
         _logger?.Information(message);
+    }
+    
+    public void Information(object source, string message, [CallerMemberName] string methodName = "")
+    {
+        var className = source.GetType().Name;
+        _logger?.ForContext("SourceContext", className)
+                .ForContext("MethodName", methodName)
+                .Information(message);
     }
 
     public void Warning(string message, Exception exception = null)
@@ -44,6 +68,21 @@ public class LoggerService
         }
     }
 
+    public void Warning(object source, string message, Exception exception = null, [CallerMemberName] string methodName = "")
+    {
+        var className = source.GetType().Name;
+        var logger = _logger?.ForContext("SourceContext", className)
+                             .ForContext("MethodName", methodName);
+        if (exception != null)
+        {
+            logger?.Warning(message, exception);
+        }
+        else
+        {
+            logger?.Warning(message);
+        }
+    }
+    
     public void Debug(string message)
     {
         _logger?.Debug(message);

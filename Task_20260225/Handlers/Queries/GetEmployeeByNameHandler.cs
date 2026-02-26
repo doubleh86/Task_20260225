@@ -18,11 +18,19 @@ public class GetEmployeeByNameHandler : QueryHandler<string>
         {
             throw new ServerException(ErrorCode.InvalidQuery, "Invalid Query [GetEmployeeByNameQuery]");
         }
-        
-        if(string.IsNullOrWhiteSpace(query.Name) == true)
-            throw new ServerException(ErrorCode.GetEmployeeByNameEmptyName, "Request Name Empty [GetEmployeeByNameQuery]");
 
+        if (string.IsNullOrWhiteSpace(query.Name) == true)
+        {
+            throw new ServerException(ErrorCode.GetEmployeeByNameEmptyName, 
+                "Request Name Field is Empty [GetEmployeeByNameQuery]");
+        }
+            
         var contacts = _cacheService.GetContactListByName(query.Name);
+        if (contacts.Count == 0)
+        {
+            _loggerService?.Information(this, "No employee found by name.");
+        }
+        
         var json = JsonSerializer.Serialize(contacts, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase

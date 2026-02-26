@@ -18,5 +18,8 @@ public enum ErrorCode
     GetEmployeeByNameEmptyName = 171,
     
     GetEmployeeWrongPageOrPageSize = 181,
+    
+    ContactInvalidEmailFormat = 191,
+    ContactInvalidDateFormat = 192,
 }
     

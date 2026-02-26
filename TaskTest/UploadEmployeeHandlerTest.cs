@@ -20,7 +20,8 @@ public class UploadEmployeeHandlerTest
 
         var result = await sut.HandleAsync();
 
-        Assert.That(result, Is.EqualTo(50));
+        Assert.That(result.Item1, Is.EqualTo(50));
+        Assert.That(result.Item2, Is.EqualTo(0));
         var contacts = cache.GetContactList(1, 10);
         Assert.That(contacts.Count, Is.EqualTo(10));
         Assert.That(contacts[0].Name, Is.EqualTo("김철수"));
@@ -36,7 +37,8 @@ public class UploadEmployeeHandlerTest
 
         var result = await sut.HandleAsync();
 
-        Assert.That(result, Is.EqualTo(50));
+        Assert.That(result.Item1, Is.EqualTo(50));
+        Assert.That(result.Item2, Is.EqualTo(0));
         var contacts = cache.GetContactList(1, 10);
         Assert.That(contacts.Count, Is.EqualTo(10));
         Assert.That(contacts[0].Date, Is.EqualTo("2025.09.12"));
@@ -48,6 +50,27 @@ public class UploadEmployeeHandlerTest
         var cache = new ContactCacheService();
         var invalidCsv = "Kim, kim@test.com";
         var command = new UploadEmployeeInfoCommand(invalidCsv);
+        using var sut = new UploadEmployeeInfoHandler(command, cache, null);
+
+        Assert.ThrowsAsync<ServerException>(async () => await sut.HandleAsync());
+    }
+
+    [Test]
+    public void HandleAsync_WithInvalidJsonText_ThrowsServerException()
+    {
+        var cache = new ContactCacheService();
+        var invalidJson = """[{ "name": "Kim", "email": "kim@test.com" }""";
+        var command = new UploadEmployeeInfoCommand(invalidJson);
+        using var sut = new UploadEmployeeInfoHandler(command, cache, null);
+
+        Assert.ThrowsAsync<ServerException>(async () => await sut.HandleAsync());
+    }
+
+    [Test]
+    public void HandleAsync_WithEmptyText_ThrowsServerException()
+    {
+        var cache = new ContactCacheService();
+        var command = new UploadEmployeeInfoCommand("   ");
         using var sut = new UploadEmployeeInfoHandler(command, cache, null);
 
         Assert.ThrowsAsync<ServerException>(async () => await sut.HandleAsync());

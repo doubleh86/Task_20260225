@@ -7,7 +7,7 @@ public abstract class QueryHandler<T> : IHandlerBase<T>, IDisposable
 {
     protected readonly IQueryBase _query;
     protected readonly ContactCacheService _cacheService;
-    protected readonly LoggerService _loggerService;
+    protected readonly LoggerService? _loggerService;
     public abstract Task<T> HandleAsync();
 
     protected QueryHandler(IQueryBase query, ContactCacheService cacheService, LoggerService? loggerService)

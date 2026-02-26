@@ -10,4 +10,9 @@ public class GetEmployeeQuery : IQueryBase
         Page = page;
         PageSize = pageSize;
     }
+
+    public string Description()
+    {
+        return $"[Page: {Page}, PageSize: {PageSize}]";
+    }
 }

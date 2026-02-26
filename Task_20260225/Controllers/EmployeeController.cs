@@ -74,9 +74,13 @@ public class EmployeeController : ApiControllerBase
                 : new UploadEmployeeInfoCommand(text!);
 
             using var handler = new UploadEmployeeInfoHandler(command, _cacheService, _serverService.LoggerService);
-            var count = await handler.HandleAsync();
+            var (successCount, failCount) = await handler.HandleAsync();
 
-            return StatusCode(201);
+            return StatusCode(201, new
+            {
+                SuccessCount = successCount,
+                FailedCount = failCount
+            });
         }
         catch (ServerException e)
         {

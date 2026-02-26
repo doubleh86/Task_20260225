@@ -20,7 +20,8 @@ public class GetEmployeeHandler : QueryHandler<string>
         }
         
         if(query.Page < 1 || query.PageSize < 1)
-            throw new ServerException(ErrorCode.GetEmployeeWrongPageOrPageSize, "Request wrong Page or Page size [GetEmployeeQuery]");
+            throw new ServerException(ErrorCode.GetEmployeeWrongPageOrPageSize, 
+                $"Request wrong Page or Page size [GetEmployeeQuery][Page : {query.Page}, Page : {query.PageSize}]");
 
         var totalCount = _cacheService.GetContactCount();
         var totalPages = query.PageSize > 0

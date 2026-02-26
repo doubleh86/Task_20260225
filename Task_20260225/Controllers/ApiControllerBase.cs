@@ -8,6 +8,8 @@ public abstract class ApiControllerBase : ControllerBase, IDisposable
 {
     protected readonly ContactCacheService _cacheService;
     protected readonly TaskServerServices _serverService;
+    
+    protected LoggerService _loggerService => _serverService.LoggerService;
 
     protected ApiControllerBase(ContactCacheService cacheService, TaskServerServices serverServices)
     {
@@ -17,20 +19,21 @@ public abstract class ApiControllerBase : ControllerBase, IDisposable
     
     protected ActionResult _HandleServerException(ServerException exception)
     {
-        _serverService.LoggerService.Warning(exception.Message, exception);
+        _loggerService.Warning(this, exception.Message, exception);
         var statusCode = _GetStatusCode(exception.ResultCode);
         var response = new
         {
             ResultCode = (int)exception.ResultCode,
             exception.Message
         };
-
+        
+        _loggerService.Warning(this, exception.Message, exception);
         return StatusCode(statusCode, response);
     }
 
     protected ActionResult _HandleUnknownException(Exception exception)
     {
-        _serverService.LoggerService.Error(exception.Message, exception);
+        _loggerService.Error(this, exception.Message, exception);
         return StatusCode(500, new
         {
             ResultCode = (int)ErrorCode.InvalidRequest,
