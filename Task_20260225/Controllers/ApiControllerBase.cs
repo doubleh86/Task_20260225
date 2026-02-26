@@ -27,7 +27,6 @@ public abstract class ApiControllerBase : ControllerBase, IDisposable
             exception.Message
         };
         
-        _loggerService.Warning(this, exception.Message, exception);
         return StatusCode(statusCode, response);
     }
 

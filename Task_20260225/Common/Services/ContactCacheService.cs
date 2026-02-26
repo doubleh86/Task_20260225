@@ -64,6 +64,7 @@ public class ContactCacheService
                 return existingEmails.Add(contact.Email.Trim());
             }).ToList();
 
+            var added = 0;
             foreach (var contact in uniqueContacts)
             {
                 if (_ValidateContact(contact) == false)
@@ -71,11 +72,12 @@ public class ContactCacheService
                     failed += 1;
                     continue;
                 }
-                    
+
                 _contactModels.Add(contact);
+                added += 1;
             }
-            
-            return _contactModels.Count;
+
+            return added;
         }
     }
 
