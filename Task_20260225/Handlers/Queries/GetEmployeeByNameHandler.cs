@@ -1,20 +1,26 @@
 using System.Text.Json;
+using Task_20260225.Application.Queries;
 using Task_20260225.Common.Services;
-using Task_20260225.Queries;
+using Task_20260225.Common.Utils;
 
 namespace Task_20260225.Handlers.Queries;
 
 public class GetEmployeeByNameHandler : QueryHandler<string>
 {
-    public GetEmployeeByNameHandler(GetEmployeeByNameQuery query, ContactCacheService cacheService)
-        : base(query, cacheService)
+    public GetEmployeeByNameHandler(GetEmployeeByNameQuery query, ContactCacheService cacheService, LoggerService loggerService)
+        : base(query, cacheService, loggerService)
     {
     }
 
     public override Task<string> HandleAsync()
     {
-        var query = _query as GetEmployeeByNameQuery;
-        ArgumentNullException.ThrowIfNull(query);
+        if (_query is not GetEmployeeByNameQuery query)
+        {
+            throw new ServerException(ErrorCode.InvalidQuery, "Invalid Query [GetEmployeeByNameQuery]");
+        }
+        
+        if(string.IsNullOrWhiteSpace(query.Name) == true)
+            throw new ServerException(ErrorCode.GetEmployeeByNameEmptyName, "Request Name Empty [GetEmployeeByNameQuery]");
 
         var contacts = _cacheService.GetContactListByName(query.Name);
         var json = JsonSerializer.Serialize(contacts, new JsonSerializerOptions

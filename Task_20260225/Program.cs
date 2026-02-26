@@ -4,7 +4,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<ContactCacheService>();
+
+_AddServices(builder.Services);
 
 var app = builder.Build();
 
@@ -20,4 +21,35 @@ app.UseStaticFiles();
 var api = app.MapGroup("/api");
 api.MapControllers();
 
+if (_InitializeServices(app.Services) == false)
+{
+    // 바로 종료
+    return;
+}
+
 app.Run();
+
+void _AddServices(IServiceCollection services)
+{
+    services.AddSingleton<ContactCacheService>();
+    services.AddSingleton<TaskServerServices>();
+}
+
+bool _InitializeServices(IServiceProvider serviceProvider)
+{
+    var configFiles = new List<string> { "appsettings.json" };
+    var serverService = serviceProvider.GetService<TaskServerServices>();
+    if (serverService == null)
+        return false;
+    
+    serverService.Initialize(configFiles);
+    serverService.LoggerService.Information("Initializing services completed");
+    
+    var cacheService = serviceProvider.GetService<ContactCacheService>();
+    if (cacheService == null)
+        return false;
+
+    cacheService.Initialize(serverService.GetValue("StartWithData", false));
+
+    return true;
+} 

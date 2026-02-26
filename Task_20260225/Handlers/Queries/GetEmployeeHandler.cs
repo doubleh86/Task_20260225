@@ -1,22 +1,40 @@
 using System.Text.Json;
+using Task_20260225.Application.Queries;
 using Task_20260225.Common.Services;
-using Task_20260225.Queries;
+using Task_20260225.Common.Utils;
 
 namespace Task_20260225.Handlers.Queries;
 
 public class GetEmployeeHandler : QueryHandler<string>
 {
-    public GetEmployeeHandler(GetEmployeeQuery query, ContactCacheService cacheService) : base(query, cacheService)
+    public GetEmployeeHandler(GetEmployeeQuery query, ContactCacheService cacheService, LoggerService loggerService) 
+        : base(query, cacheService, loggerService)
     {
     }
 
     public override Task<string> HandleAsync()
     {
-        var query = _query as GetEmployeeQuery;
-        ArgumentNullException.ThrowIfNull(query);
+        if (_query is not GetEmployeeQuery query)
+        {
+            throw new ServerException(ErrorCode.InvalidQuery, "Invalid Query [GetEmployeeQuery]");
+        }
+        
+        if(query.Page < 1 || query.PageSize < 1)
+            throw new ServerException(ErrorCode.GetEmployeeWrongPageOrPageSize, "Request wrong Page or Page size [GetEmployeeQuery]");
 
+        var totalCount = _cacheService.GetContactCount();
+        var totalPages = query.PageSize > 0
+            ? (int)Math.Ceiling(totalCount / (double)query.PageSize)
+            : 0;
         var contacts = _cacheService.GetContactList(query.Page, query.PageSize);
-        var json = JsonSerializer.Serialize(contacts, new JsonSerializerOptions
+        var response = new
+        {
+            totalCount,
+            totalPages,
+            items = contacts
+        };
+
+        var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });

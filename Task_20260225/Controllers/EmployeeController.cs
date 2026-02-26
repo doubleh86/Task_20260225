@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Task_20260225.Command;
+using Task_20260225.Application.Command;
+using Task_20260225.Application.Queries;
 using Task_20260225.Common.Services;
+using Task_20260225.Common.Utils;
 using Task_20260225.Handlers.Commands;
 using Task_20260225.Handlers.Queries;
-using Task_20260225.Queries;
 
 namespace Task_20260225.Controllers;
 
@@ -11,45 +12,81 @@ namespace Task_20260225.Controllers;
 [Route("[controller]")]
 public class EmployeeController : ApiControllerBase
 {
-    private readonly ContactCacheService _cacheService;
+    
 
-    public EmployeeController(ContactCacheService cacheService)
+    public EmployeeController(ContactCacheService cacheService, TaskServerServices serverServices) 
+        : base(cacheService, serverServices)
     {
-        _cacheService = cacheService;
     }
 
     [HttpGet]
     public async Task<ActionResult> Get(int page, int pageSize)
     {
-        var query = new GetEmployeeQuery(page, pageSize);
-        using var handler = new GetEmployeeHandler(query, _cacheService);
+        try
+        {
+            var query = new GetEmployeeQuery(page, pageSize);
+            using var handler = new GetEmployeeHandler(query, _cacheService, _serverService.LoggerService);
 
-        var result = await handler.HandleAsync();
-        return Content(result, "application/json");
+            var result = await handler.HandleAsync();
+            return Content(result, "application/json");
+        }
+        catch (ServerException e)
+        {
+            return _HandleServerException(e);
+        }
+        catch (Exception e)
+        {
+            return _HandleUnknownException(e);
+        }
     }
 
     [HttpGet("{name}")]
     public async Task<ActionResult> Get(string name)
     {
-        var query = new GetEmployeeByNameQuery(name);
-        using var handler = new GetEmployeeByNameHandler(query, _cacheService);
+        try
+        {
+            var query = new GetEmployeeByNameQuery(name);
+            using var handler = new GetEmployeeByNameHandler(query, _cacheService, _serverService.LoggerService);
 
-        var result = await handler.HandleAsync();
-        return Content(result, "application/json");
+            var result = await handler.HandleAsync();
+            return Content(result, "application/json");
+        }
+        catch (ServerException e)
+        {
+            return _HandleServerException(e);
+        }
+        catch (Exception e)
+        {
+            return _HandleUnknownException(e);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<int>> Post([FromForm] IFormFile? file, [FromForm] string? text)
     {
-        if ((file is null || file.Length == 0) && string.IsNullOrWhiteSpace(text))
-            return BadRequest("file or text is required.");
+        try
+        {
+            if ((file is null || file.Length == 0) && string.IsNullOrWhiteSpace(text))
+                return BadRequest("file or text is required.");
 
-        var command = file is not null && file.Length > 0
-            ? new UploadEmployeeInfoCommand(file)
-            : new UploadEmployeeInfoCommand(text!);
+            var command = file is not null && file.Length > 0
+                ? new UploadEmployeeInfoCommand(file)
+                : new UploadEmployeeInfoCommand(text!);
 
-        using var handler = new UploadEmployeeInfoHandler(command, _cacheService);
-        var count = await handler.HandleAsync();
-        return Ok(count);
+            using var handler = new UploadEmployeeInfoHandler(command, _cacheService, _serverService.LoggerService);
+            var count = await handler.HandleAsync();
+
+            return StatusCode(201);
+        }
+        catch (ServerException e)
+        {
+            return _HandleServerException(e);
+        }
+        catch (Exception e)
+        {
+            return _HandleUnknownException(e);
+        }
     }
+
+    
 }

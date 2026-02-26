@@ -1,4 +1,4 @@
-namespace Task_20260225.Queries;
+namespace Task_20260225.Application.Queries;
 
 public class GetEmployeeByNameQuery : IQueryBase
 {

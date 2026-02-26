@@ -3,9 +3,9 @@
 public class ServerException : Exception
 {
     public override string Message { get; }
-    public readonly int ResultCode;
+    public readonly ErrorCode ResultCode;
 
-    public ServerException(int resultCode, string message)
+    public ServerException(ErrorCode resultCode, string message)
     {
         Message = message;
         ResultCode = resultCode;

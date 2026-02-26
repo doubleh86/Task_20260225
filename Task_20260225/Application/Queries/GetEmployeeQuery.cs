@@ -1,6 +1,4 @@
-﻿using Task_20260225.Command;
-
-namespace Task_20260225.Queries;
+﻿namespace Task_20260225.Application.Queries;
 
 public class GetEmployeeQuery : IQueryBase
 {

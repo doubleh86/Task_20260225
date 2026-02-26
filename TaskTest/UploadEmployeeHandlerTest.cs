@@ -1,4 +1,5 @@
-using Task_20260225.Command;
+using Task_20260225.Application.Command;
+using Task_20260225.Application.Handlers.Commands;
 using Task_20260225.Common.Services;
 using Task_20260225.Common.Utils;
 using Task_20260225.Handlers.Commands;
@@ -12,9 +13,10 @@ public class UploadEmployeeHandlerTest
     public async Task HandleAsync_WithJsonText_AddsContacts()
     {
         var cache = new ContactCacheService();
+        
         var json = await File.ReadAllTextAsync(GetTestDataPath("contact.json"));
         var command = new UploadEmployeeInfoCommand(json);
-        using var sut = new UploadEmployeeInfoHandler(command, cache);
+        using var sut = new UploadEmployeeInfoHandler(command, cache, null);
 
         var result = await sut.HandleAsync();
 
@@ -30,7 +32,7 @@ public class UploadEmployeeHandlerTest
         var cache = new ContactCacheService();
         var csv = await File.ReadAllTextAsync(GetTestDataPath("contact.csv"));
         var command = new UploadEmployeeInfoCommand(csv);
-        using var sut = new UploadEmployeeInfoHandler(command, cache);
+        using var sut = new UploadEmployeeInfoHandler(command, cache, null);
 
         var result = await sut.HandleAsync();
 
@@ -46,7 +48,7 @@ public class UploadEmployeeHandlerTest
         var cache = new ContactCacheService();
         var invalidCsv = "Kim, kim@test.com";
         var command = new UploadEmployeeInfoCommand(invalidCsv);
-        using var sut = new UploadEmployeeInfoHandler(command, cache);
+        using var sut = new UploadEmployeeInfoHandler(command, cache, null);
 
         Assert.ThrowsAsync<ServerException>(async () => await sut.HandleAsync());
     }

@@ -1,4 +1,4 @@
-namespace Task_20260225.Command;
+namespace Task_20260225.Application.Command;
 
 public class UploadEmployeeInfoCommand : ICommandBase
 {

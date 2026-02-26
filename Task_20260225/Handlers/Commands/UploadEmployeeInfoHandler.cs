@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Task_20260225.Command;
+using Task_20260225.Application.Command;
+using Task_20260225.Application.Handlers.Commands;
 using Task_20260225.Common.Services;
 using Task_20260225.Common.Utils;
 using Task_20260225.Models;
@@ -8,15 +9,15 @@ namespace Task_20260225.Handlers.Commands;
 
 public class UploadEmployeeInfoHandler : CommandHandler<int>
 {
-    public UploadEmployeeInfoHandler(UploadEmployeeInfoCommand command, ContactCacheService cacheService)
-        : base(command, cacheService)
+    public UploadEmployeeInfoHandler(UploadEmployeeInfoCommand command, ContactCacheService cacheService, LoggerService loggerService)
+        : base(command, cacheService, loggerService)
     {
     }
 
     public override async Task<int> HandleAsync()
     {
         if (_command is not UploadEmployeeInfoCommand command)
-            throw new ServerException(-1, "Invalid Command Data");
+            throw new ServerException(ErrorCode.InvalidCommand, "Invalid Command [UploadEmployeeInfoCommand]");
 
         if (command.IsFileType() == false)
         {
@@ -24,7 +25,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         }
         
         if(command.File == null)
-            throw new ServerException(-1, "File is required");
+            throw new ServerException(ErrorCode.UploadEmployeeInfoFileIsNull, "File is required");
 
         var file = command.File;
         var extension = Path.GetExtension(file.FileName);
@@ -34,13 +35,13 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         if (string.Equals(extension, ".csv", StringComparison.OrdinalIgnoreCase))
             return await _HandleCsvType(command.File);
 
-        throw new ServerException(-1, "Only .json or .csv files are supported");
+        throw new ServerException(ErrorCode.UploadEmployeeInfoWrongFileType, "Only .json or .csv files are supported");
     }
 
     private async Task<int> _HandleTextType(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
-            throw new ServerException(-1, "Text is required");
+            throw new ServerException(ErrorCode.UploadEmployeeInfoTextEmpty, "Text is required");
 
         var trimmed = text.TrimStart();
         if (trimmed.StartsWith("[") || trimmed.StartsWith("{"))
@@ -63,7 +64,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         }
         catch (JsonException)
         {
-            throw new ServerException(-1, "Invalid JSON format");
+            throw new ServerException(ErrorCode.UploadEmployeeInfoInvalidJson, "Invalid JSON format");
         }
 
         if (contacts is null || contacts.Count == 0)
@@ -85,7 +86,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
 
             var columns = line.Split(',', StringSplitOptions.TrimEntries);
             if (columns.Length < 4)
-                throw new ServerException(-1, "Invalid CSV format");
+                throw new ServerException(ErrorCode.UploadEmployeeInfoInvalidCsv, "Invalid CSV format");
 
             contacts.Add(new ContactModel
             {
@@ -118,7 +119,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
         }
         catch (JsonException)
         {
-            throw new ServerException(-1, "Invalid JSON format");
+            throw new ServerException(ErrorCode.UploadEmployeeInfoInvalidJsonWithText, "Invalid JSON format");
         }
 
         return 0;
@@ -136,7 +137,7 @@ public class UploadEmployeeInfoHandler : CommandHandler<int>
 
             var columns = line.Split(',', StringSplitOptions.TrimEntries);
             if (columns.Length < 4)
-                throw new ServerException(-1, "Invalid CSV format");
+                throw new ServerException(ErrorCode.UploadEmployeeInfoInvalidCsvWithText, "Invalid CSV format");
 
             contacts.Add(new ContactModel
             {
