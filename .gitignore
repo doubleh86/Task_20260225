@@ -2,6 +2,7 @@
 [Bb]in/
 [Oo]bj/
 out/
+/Logs/
 
 # User-specific files
 *.user
@@ -46,3 +47,6 @@ packages/
 # OS files
 .DS_Store
 Thumbs.db
+
+# LogFile
+*.log

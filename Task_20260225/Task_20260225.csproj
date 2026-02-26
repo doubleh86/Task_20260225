@@ -20,6 +20,7 @@
     <ItemGroup>
       <Folder Include="Application\" />
       <Folder Include="Common\" />
+      <Folder Include="Logs\" />
     </ItemGroup>
 
     <ItemGroup>
