@@ -1,4 +1,4 @@
-﻿namespace Task_20260225.Utils;
+﻿namespace Task_20260225.Common.Utils;
 
 public class ServerException : Exception
 {

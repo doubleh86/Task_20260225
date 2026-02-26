@@ -1,6 +1,6 @@
 ﻿using Task_20260225.Models;
 
-namespace Task_20260225.Services;
+namespace Task_20260225.Common.Services;
 
 public class ContactCacheService
 {

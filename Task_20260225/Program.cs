@@ -1,4 +1,4 @@
-using Task_20260225.Services;
+using Task_20260225.Common.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
