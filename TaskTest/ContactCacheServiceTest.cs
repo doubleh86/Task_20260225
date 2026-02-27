@@ -57,11 +57,13 @@ public class ContactCacheServiceTest
     {
         var cache = new ContactCacheService();
 
-        cache.AddContactList([
+        var success = cache.AddContactList([
             new ContactModel { Name = "A", Email = "dup@test.com", Phone = "010-0000-0001", Date = "2026.01.01" },
             new ContactModel { Name = "B", Email = "DUP@test.com", Phone = "010-0000-0002", Date = "2026.01.02" }
-        ], out var _);
+        ], out var failed);
 
+        Assert.That(success, Is.EqualTo(1));
+        Assert.That(failed, Is.EqualTo(1));
         Assert.That(cache.GetContactCount(), Is.EqualTo(1));
     }
 

@@ -48,25 +48,22 @@ public class ContactCacheService
             if (contactModels.Count == 0)
                 return _contactModels.Count;
 
-            
-
             var existingEmails = new HashSet<string>(
                 _contactModels
                     .Where(x => string.IsNullOrWhiteSpace(x.Email) == false)
                     .Select(x => x.Email.Trim()),
                 StringComparer.OrdinalIgnoreCase);
 
-            var uniqueContacts = contactModels.Where(contact =>
-            {
-                if (string.IsNullOrWhiteSpace(contact.Email))
-                    return true;
-
-                return existingEmails.Add(contact.Email.Trim());
-            }).ToList();
-
             var added = 0;
-            foreach (var contact in uniqueContacts)
+            foreach (var contact in contactModels)
             {
+                if (string.IsNullOrWhiteSpace(contact.Email) == false &&
+                    existingEmails.Add(contact.Email.Trim()) == false)
+                {
+                    failed += 1;
+                    continue;
+                }
+
                 if (_ValidateContact(contact) == false)
                 {
                     failed += 1;
